@@ -1,66 +1,80 @@
-import express from "express";
-import cors from "cors";
+import express from 'express';
+import cors from 'cors';
 
 const app = express();
 const port = process.env.PORT || 5002;
 
 const todos = [];
 
-app.use(express.json()); // To convert body into JSON
-app.use(cors({ origin: ['http://localhost:5173', 'https://frontend.surge.sh'] }))
+app.use(express.json()); // To parse incoming JSON requests
+app.use(cors({
+  origin: ['https://todo-list-with-backend.netlify.app', 'http://localhost:5173'],
+  methods: 'GET,POST,PUT,DELETE',
+  allowedHeaders: 'Content-Type',
+}));
 
-
-app.get("/api/v1/todos", (request, response) => {
-  const message = !todos.length ? "todos empty" : "ye lo sab todos";
-
-  response.send({ data: todos, message: message });
+// Get all todos
+app.get('/api/v1/todos', (req, res) => {
+  const message = todos.length === 0 ? 'No todos found' : 'Todos retrieved successfully';
+  res.status(200).json({ data: todos, message });
 });
 
+// Add a new todo
+app.post('/api/v1/todo', (req, res) => {
+  const { todo } = req.body;
 
-app.post("/api/v1/todo", (request, response) => {
-  const obj = {
-    todoContent: request.body.todo,
+  // Handle case where the todo content is missing
+  if (!todo) {
+    return res.status(400).json({ message: 'Todo content is required' });
+  }
+
+  const newTodo = {
+    todoContent: todo,
     id: String(new Date().getTime()),
   };
 
-  todos.push(obj);
-
-  response.send({ message: "todo add hogya hy", data: obj });
+  todos.push(newTodo);
+  res.status(201).json({ message: 'Todo added successfully', data: newTodo });
 });
 
+// Update an existing todo
+app.patch('/api/v1/todo/:id', (req, res) => {
+  const { id } = req.params;
+  const { todoContent } = req.body;
 
-app.patch("/api/v1/todo/:id", (request, response) => {
-  const id = request.params.id;
+  // Handle case where todo content is missing
+  if (!todoContent) {
+    return res.status(400).json({ message: 'New todo content is required' });
+  }
 
   let isFound = false;
   for (let i = 0; i < todos.length; i++) {
     if (todos[i].id === id) {
-
-
-      todos[i].todoContent = request.body.todoContent;
+      todos[i].todoContent = todoContent;
       isFound = true;
       break;
     }
   }
 
   if (isFound) {
-    response.status(201).send({
-      data: { todoContent: request.body.todoContent, id: id },
-      message: "todo updated successfully!",
+    res.status(200).json({
+      message: 'Todo updated successfully',
+      data: { id, todoContent },
     });
   } else {
-    response.status(200).send({ data: null, message: "todo not found" });
+    res.status(404).json({ message: 'Todo not found' });
   }
 });
 
-app.delete("/api/v1/todo/:id", (request, response) => {
-  const id = request.params.id;
+// Delete a todo
+app.delete('/api/v1/todo/:id', (req, res) => {
+  const { id } = req.params;
 
   let isFound = false;
   for (let i = 0; i < todos.length; i++) {
     if (todos[i].id === id) {
 
-
+      
       todos.splice(i, 1);
 
       isFound = true;
@@ -69,22 +83,19 @@ app.delete("/api/v1/todo/:id", (request, response) => {
   }
 
   if (isFound) {
-    response.status(201).send({
-
-      message: "todo deleted successfully!",
-    });
+    res.status(200).json({ message: 'Todo deleted successfully' });
   } else {
-    response.status(200).send({ data: null, message: "todo not found" });
+    res.status(404).json({ message: 'Todo not found' });
   }
 });
 
-
-
-app.use((request, response) => {
-  response.status(404).send("no route found!");
+// Catch-all route for unrecognized paths
+app.use((req, res) => {
+  res.status(404).json({ message: 'Route not found' });
 });
 
+// Start the server
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+  console.log(`Server running on port ${port}`);
 });
 
