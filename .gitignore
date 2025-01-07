@@ -1,1 +1,16 @@
-node_modu
+# Node modules
+node_modules/
+
+# Build files
+build/
+
+# Logs
+*.log
+
+# React environment files
+.env.local
+.env.development
+.env.production
+
+# macOS system files
+.DS_Store
