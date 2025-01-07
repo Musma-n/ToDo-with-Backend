@@ -8,7 +8,7 @@ const todos = [];
 
 app.use(express.json()); // To parse incoming JSON requests
 app.use(cors({
-  origin: ['https://todo-list-with-backend.netlify.app', 'http://localhost:5173',"https://to-do-with-backend-three.vercel.app/"],
+  origin: ['https://todo-list-with-backend.netlify.app', 'http://localhost:5173',"https://to-do-with-backend04.vercel.app/"],
   methods: 'GET,POST,PUT,DELETE',
   allowedHeaders: 'Content-Type',
 }));
