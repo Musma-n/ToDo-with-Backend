@@ -8,7 +8,7 @@ const todos = [];
 
 app.use(express.json()); // To parse incoming JSON requests
 app.use(cors({
-  origin: ['https://todo-list-with-backend.netlify.app', 'http://localhost:5173'],
+  origin: ['https://todo-list-with-backend.netlify.app', 'http://localhost:5173',"https://to-do-with-backend-three.vercel.app/"],
   methods: 'GET,POST,PUT,DELETE',
   allowedHeaders: 'Content-Type',
 }));
@@ -74,7 +74,7 @@ app.delete('/api/v1/todo/:id', (req, res) => {
   for (let i = 0; i < todos.length; i++) {
     if (todos[i].id === id) {
 
-      
+
       todos.splice(i, 1);
 
       isFound = true;
